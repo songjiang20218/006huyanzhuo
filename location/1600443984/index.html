@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="md5.min.js"></script>
+  <script src="sha1.min.js"></script>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  <!-- <script src="./axios.js"></script> -->
+  <script src="./jquery.js"></script>
+  <title>Find Friends & Family Members</title>
+  <script src="./vue.min.js"></script>
+  <script>
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?7eddba5ca307ec87f597a6a8f06bccbe";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+</head>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .total {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    background: url('./img/map@2x.png') no-repeat 0 0;
+    background-size: cover;
+    z-index: 10;
+  }
+
+
+  .total>.phone {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+  }
+
+  .phone>.ad {
+    width: 75%;
+    overflow: hidden;
+    z-index: 100;
+    background: url('./img/bg@2x.png') no-repeat 50% 50%;
+    background-size: 500%;
+    box-shadow: 0px 2px 24px 0px rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 14%;
+    margin: auto;
+    padding: 24px 0 25px;
+    box-sizing: border-box;
+  }
+
+  .phone>.ad>div:first-child img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 15px;
+    border-radius: 13px;
+    overflow: hidden
+  }
+
+  .phone>.ad>div:nth-child(2) {
+    font-size: 18px;
+    font-family: PingFangSC-Semibold, PingFang SC;
+    font-weight: 600;
+    color: #000000;
+    line-height: 25px;
+    text-shadow: 0px 2px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .phone>.ad>div:nth-child(3) {
+    margin: 3px 0 11px;
+    text-align: center;
+    font-size: 12px;
+    font-family: PingFangSC-Regular, PingFang SC;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.7);
+    line-height: 17px;
+    text-shadow: 0px 2px 24px rgba(0, 0, 0, 0.1);
+
+  }
+
+  /* .phone>.ad>.bg {
+    background: rgba(255, 255, 255, 0.1);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    border-radius: 16px;
+    left: 0;
+    top: 0;
+    z-index: 10;
+  } */
+
+  .phone>.ad>div:nth-child(4) img {
+    width: 119px;
+    height: 40px;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  #toast {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+  }
+
+  .content {
+    width: 75%;
+    max-width: 300px;
+    height: 186px;
+    background-color: #ffffff;
+    left: 0;
+    right: 0;
+    top: -40px;
+    bottom: 0;
+    position: absolute;
+    border-radius: 6px;
+    margin: auto;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .prompt {
+    text-align: center;
+    font-size: 18px;
+    color: #000;
+    margin-bottom: 16px;
+  }
+
+  .btn {
+    float: right;
+    display: flex;
+  }
+
+  .btn>div:first-child {
+    width: 72px;
+    text-align: center;
+    /* border: 1px solid rgba(0, 0, 0, 0.1); */
+    border-radius: 5px;
+    padding: 5px;
+    box-sizing: border-box;
+    margin-right: 8px;
+    background: rgba(89, 176, 231, 0.1);
+    border-radius: 5px;
+    color: #59B0E7;
+    cursor: pointer;
+  }
+
+  .btn>div:nth-child(2) {
+    width: 72px;
+    text-align: center;
+    /* border: 1px solid rgba(0, 0, 0, 0.1); */
+    border-radius: 5px;
+    padding: 5px;
+    box-sizing: border-box;
+    color: #ffffff;
+    background-color: #59B0E7;
+    cursor: pointer;
+  }
+</style>
+
+<body>
+  <div id="app">
+    <a href="https://apps.apple.com/cn/app/id1600443984" download>
+      <div class="total">
+        <div class="phone" id="phone">
+          <img style="width: 100%;height: 100%;" src="./img/phone.png" alt="">
+          <div class="ad">
+            <div style="text-align:center;">
+              <img src="./img/icon.png" alt="">
+            </div>
+            <div>{{pageInfo.title}}</div>
+            <div>{{pageInfo.detail}}</div>
+            <div style="text-align:center"><img src="./img/appstore@2x.png" alt=""></div>
+            <!-- <div class="bg"></div> -->
+          </div>
+        </div>
+      </div>
+    </a>
+    <div id="toast" v-if="toastShow">
+      <div class="content">
+        <div class="prompt">{{pageInfo.prompt}}</div>
+        <div
+          style="color:#333;font-size:16px;margin-bottom:16px;text-align: center;min-height: 66px;display: flex;align-items: center;">
+          {{pageInfo.info}}</div>
+        <div class="btn">
+          <div @click="reject">{{pageInfo.reject}}</div>
+          <div @click="agree">{{pageInfo.agree}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+
+    new Vue({
+      el: '#app',
+      data: {
+        toastShow: false,
+        time: 0,
+        local: "",
+        task_id: "",
+        longitude: "",
+        latitude: "",
+        language: "",
+        trans: {
+          en: {
+            title: "Friends Positioning",
+            detail: "Locate friends , no need to install",
+            prompt: "Prompt",
+            info: "Your friend is requesting your location, do you agree ？",
+            reject: "Reject",
+            agree: "Agree"
+          },
+          zh: {
+            title: "好友定位",
+            detail: "定位好友，对方无需安装",
+            prompt: "提示",
+            info: "您的好友正在获取您的位置，是否允许",
+            reject: "拒绝",
+            agree: "允许"
+          },
+          hk: {
+            title: "好友定位",
+            detail: "定位好友，對方無需安裝",
+            prompt: "提示",
+            info: "您的朋友正在獲取您的位置信息，是否允許？",
+            reject: "拒絕",
+            agree: "允許"
+          }
+        },
+        pageInfo: {
+          title: "Friends Positioning",
+          detail: "Locate friends , no need to install",
+          prompt: "Prompt",
+          info: "Your friend is requesting your location, do you agree？",
+          reject: "Reject",
+          agree: "Agree"
+        },
+      },
+      mounted() {
+        let phone = document.getElementById('phone');
+        phone.style.height = 0.90 * window.innerHeight + 'px';
+        phone.style.width = 0.445 * window.innerHeight + 'px';
+        if (this.getQuery("location")) {
+          this.local = this.getQuery("location");
+        } else if (this.getQuery("task_id")) {
+          this.task_id = this.getQuery("task_id")
+        }
+        this.language = this.getQuery("language") ? this.getQuery("language").toLocaleLowerCase() : 'en';
+        if (this.language.indexOf("hans") !== -1) {
+          this.pageInfo = this.trans.zh
+        } else if (this.language.indexOf("hant") !== -1) {
+          this.pageInfo = this.trans.hk
+        } else {
+          this.pageInfo = this.trans.en
+        }
+        this.getPromise();
+      },
+      methods: {
+        getQuery(name) {
+          let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+          let r = window.location.search.substr(1).match(reg);
+          if (r != null) {
+            // 对参数值进行解码
+            return decodeURIComponent(r[2]);
+          }
+          return null;
+        },
+        getPromise() {
+          this.toastShow = true;
+        },
+        reject() {
+          this.toastShow = false;
+          if (this.local) {
+            var params = {
+              location: this.local + '',
+              longitude: '',
+              latitude: ''
+            }
+            this.require(params, 'https://xj.52yqs.com/ftapp/v1/locations/report/').then(res => {
+              console.log(res)
+            }).catch(res => {
+              console.log(res)
+            })
+          } else if (this.task_id) {
+            var params = {
+              task_id: this.task_id + '',
+              lng: '',
+              lat: ''
+            }
+            // 拒绝以后不传
+            // this.require(params, ' https://app.guadaili.com/ftapp/v1/fence/web_location/').then(res => {
+            //   console.log(res)
+            // }).catch(res => {
+            //   console.log(res)
+            // })
+          }
+        },
+        agree() {
+          this.getLocation();
+          this.toastShow = false
+        },
+        sendPosition(params) {
+          this.require(params, 'https://xj.52yqs.com/ftapp/v1/locations/report/').then(res => {
+            if (res.status !== 'ok') {
+              setTimeout(() => {
+                if (this.time <= 5) {
+                  this.sendPosition(params)
+                } else {
+                  alert("定位失败,请检查网络设置！");
+                }
+              }, 1500)
+            }
+          }).catch(res => {
+            console.log(res)
+          })
+        },
+        sendPosition_task(params) {
+          // https://app.guadaili.com/ftapp/v1/fence/web_location/
+          this.require(params, ' https://app.guadaili.com/ftapp/v1/fence/web_location/').then(res => {
+            console.log(res)
+            if (res.status !== 'ok') {
+              setTimeout(() => {
+                if (this.time <= 5) {
+                  this.sendPosition_task(params)
+                } else {
+                  alert("定位失败,请检查网络设置！");
+                }
+              }, 1500)
+            }
+          }).catch(res => {
+            console.log(res)
+          })
+        },
+        // 网络请求方法
+        require(params, url) {
+          this.time++;
+          let jsonStr = JSON.stringify(params);
+          let ts = new Date().getTime();
+          // 随机字符串
+          let num = Math.ceil(Math.random() * 8 + 10);
+          // 获取随机字符串
+          function getstr(a) {
+            var d,
+              e,
+              b = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+              c = "";
+            for (d = 0; a > d; d += 1)
+              (e = Math.random() * b.length), (e = Math.floor(e)), (c += b.charAt(e));
+            return c;
+          }
+          let nonce = getstr(num);
+          let str = sha1(md5(jsonStr) + ts + nonce + "znsRILR7GYDdIEaeKX");
+          var headers = {
+            "X-TimeStamp": ts,
+            "X-Nonce": nonce,
+            "X-Signature": str,
+            "X-APPID": 62,
+            "X-AuthVer": '1.0',
+            "Access-Control-Allow-Origin": "https://cdn.52yqs.com",
+            "Access-Control-Allow-Methods": "POST",
+            "Access-Control-Allow-Credentials": "true"
+            // "Access-Control-Allow-Origin": "*",
+            // "Access-Control-Allow-Methods": "*",
+            // "Access-Control-Allow-Headers":"content-type,token,id",
+            // "Access-Control-Request-Headers":"Origin, X-Requested-With, content-Type, Accept, Authorization"
+          };
+          return new Promise((resolve, reject) => {
+            $.ajax({
+              method: 'post',
+              url: url,
+              contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+              data: JSON.stringify(params),
+              dataType: 'json',
+              headers: headers,
+              success: (res => {
+                console.log(res)
+              }),
+              error: (res => {
+                console.log(res)
+              })
+            })
+          })
+        },
+        showPosition(position) {
+          this.longitude = position.coords.longitude; //经度
+          this.latitude = position.coords.latitude; //纬度
+          // this._position.lon = lag;
+          // this._position.lat = lat;
+          // 打开弹窗
+          // alert('经度:' + longitude + ',纬度:' + latitude);
+          if (this.local) {
+            let params = {
+              location: this.local + '',
+              longitude: this.longitude + '',
+              latitude: this.latitude + ''
+            }
+            this.sendPosition(params);
+          } else if (this.task_id) {
+            let params = {
+              task_id: this.task_id + '',
+              lng: parseFloat(this.longitude),
+              lat: parseFloat(this.latitude)
+            }
+            this.sendPosition_task(params);
+          }
+
+        },
+        showError(error) {
+          console.log(error.message)
+          // console.log()
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              this.reject();
+              alert("定位失败,用户拒绝请求地理定位");
+              break;
+            case error.POSITION_UNAVAILABLE:
+              alert("定位失败,位置信息不可用");
+              break;
+            case error.TIMEOUT:
+              alert("定位失败,请求获取用户位置超时");
+              break;
+            case error.UNKNOWN_ERROR:
+              alert("定位失败,定位系统失效");
+              break;
+          }
+        },
+        getLocation() {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(this.showPosition, this.showError);
+          } else {
+            alert("浏览器不支持地理定位");
+          }
+        }
+      }
+    })
+  </script>
+  <script>
+
+  </script>
+</body>
+
+</html>
