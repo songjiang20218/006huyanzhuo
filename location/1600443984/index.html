@@ -11,15 +11,6 @@
   <script src="./jquery.js"></script>
   <title>Find Friends & Family Members</title>
   <script src="./vue.min.js"></script>
-  <script>
-    var _hmt = _hmt || [];
-    (function () {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?7eddba5ca307ec87f597a6a8f06bccbe";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
-  </script>
 </head>
 <style>
   body {
@@ -299,7 +290,8 @@
               longitude: '',
               latitude: ''
             }
-            this.require(params, 'https://xj.52yqs.com/ftapp/v1/locations/report/').then(res => {
+            console.log(params)
+            this.require(params, 'https://app.guadaili.com/ftapp/v1/locations/report/').then(res => {
               console.log(res)
             }).catch(res => {
               console.log(res)
@@ -323,7 +315,7 @@
           this.toastShow = false
         },
         sendPosition(params) {
-          this.require(params, 'https://xj.52yqs.com/ftapp/v1/locations/report/').then(res => {
+          this.require(params, 'https://app.guadaili.com/ftapp/v1/locations/report/').then(res => {
             if (res.status !== 'ok') {
               setTimeout(() => {
                 if (this.time <= 5) {
